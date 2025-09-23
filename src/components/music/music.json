@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_music_music",
+  "info": {
+    "displayName": "music",
+    "icon": "music"
+  },
+  "options": {},
+  "attributes": {
+    "poster": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "spotifyLink": {
+      "type": "string"
+    },
+    "appleLink": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

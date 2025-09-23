@@ -1,0 +1,36 @@
+{
+  "collectionName": "components_sharedcard_shared_cards",
+  "info": {
+    "displayName": "shared.card",
+    "icon": "stack"
+  },
+  "options": {},
+  "attributes": {
+    "poster": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "spoiler": {
+      "type": "blocks"
+    },
+    "buyLink": {
+      "type": "string"
+    },
+    "buttonLabel": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

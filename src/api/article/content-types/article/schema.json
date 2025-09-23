@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "articles",
+  "info": {
+    "singularName": "article",
+    "pluralName": "articles",
+    "displayName": "Article"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Cover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Title": {
+      "type": "string"
+    },
+    "Content": {
+      "type": "blocks"
+    },
+    "Gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "books": {
+      "type": "component",
+      "component": "sharedcard.shared-card",
+      "repeatable": true
+    },
+    "moviesTvSeries": {
+      "type": "component",
+      "component": "sharedcard.shared-card",
+      "repeatable": true
+    },
+    "anime": {
+      "type": "component",
+      "component": "sharedcard.shared-card",
+      "repeatable": true
+    },
+    "games": {
+      "type": "component",
+      "component": "sharedcard.shared-card",
+      "repeatable": true
+    },
+    "music": {
+      "type": "component",
+      "component": "music.music",
+      "repeatable": true
+    },
+    "article_title": {
+      "type": "string"
+    },
+    "article_preview": {
+      "type": "blocks"
+    },
+    "article_category": {
+      "type": "enumeration",
+      "enum": [
+        "Books",
+        "Movies",
+        "Series",
+        "Anime",
+        "Games"
+      ]
+    },
+    "article_cover": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

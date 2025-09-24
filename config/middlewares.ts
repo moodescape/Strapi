@@ -1,9 +1,18 @@
 export default [
-  'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
-  'strapi::poweredBy',
+  {
+    name: 'strapi::cors',
+    config: {
+      enabled: true,
+      headers: '*',
+      origin: [
+        'https://cultureverse.netlify.app', // твой сайт Netlify
+        'http://localhost:1337'             // для локальной разработки
+      ],
+    },
+  },
+  'strapi::logger',
   'strapi::query',
   'strapi::body',
   'strapi::session',

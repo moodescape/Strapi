@@ -3,32 +3,51 @@
 const fetch = require("node-fetch");
 
 async function fetchGameFromIGDB(title) {
+  const res = await fetch("https://api.igdb.com/v4/games", {
+    method: "POST",
+    headers: {
+      "Client-ID": process.env.IGDB_CLIENT_ID,
+      "Authorization": `Bearer ${process.env.IGDB_ACCESS_TOKEN}`,
+      "Accept": "application/json"
+    },
+    body: `search "${title}"; fields name, cover.url, summary; limit 1;`
+  });
+
+  const data = await res.json();
+  if (!data.length) return null;
+
+  const game = data[0];
+  return {
+    title: game.name,
+    poster: game.cover?.url
+      ? game.cover.url.replace("t_thumb", "t_cover_big")
+      : null,
+    description: game.summary || ""
+  };
+}
+
+// ⚡ функция для загрузки картинки в Strapi Uploads
+async function uploadImageFromUrl(url) {
   try {
-    const res = await fetch("https://api.igdb.com/v4/games", {
-      method: "POST",
-      headers: {
-        "Client-ID": process.env.IGDB_CLIENT_ID,
-        "Authorization": `Bearer ${process.env.IGDB_ACCESS_TOKEN}`,
-        "Accept": "application/json"
-      },
-      body: `search "${title}"; fields name, cover.url, summary; limit 1;`
+    const res = await fetch(url);
+    const buffer = await res.buffer();
+
+    const uploaded = await strapi.plugins["upload"].services.upload.upload({
+      data: {}, // метаданные
+      files: {
+        path: null,
+        name: url.split("/").pop(),
+        type: "image/jpeg",
+        size: buffer.length,
+        buffer
+      }
     });
 
-    const data = await res.json();
-    if (data.length > 0) {
-      const game = data[0];
-      return {
-        title: game.name,
-        poster: game.cover?.url
-          ? game.cover.url.replace("t_thumb", "t_cover_big") // норм качество
-          : null,
-        description: game.summary || ""
-      };
-    }
+    return uploaded[0].id; // возвращаем id файла
   } catch (err) {
-    strapi.log.error("IGDB fetch error:", err);
+    strapi.log.error("Ошибка загрузки постера:", err);
+    return null;
   }
-  return null;
 }
 
 module.exports = {
@@ -38,10 +57,13 @@ module.exports = {
       const igdbData = await fetchGameFromIGDB(data.title);
       if (igdbData) {
         if (!data.description) {
-          data.description = [{ type: "paragraph", children: [{ type: "text", text: igdbData.description }] }];
+          data.description = [
+            { type: "paragraph", children: [{ type: "text", text: igdbData.description }] }
+          ];
         }
-        if (!data.poster) {
-          data.poster = igdbData.poster; // ⚠️ если poster = Media, сюда лучше сохранить URL, Strapi сам подхватит
+        if (!data.poster && igdbData.poster) {
+          const fileId = await uploadImageFromUrl("https:" + igdbData.poster);
+          if (fileId) data.poster = fileId; // привязка к Media
         }
       }
     }
@@ -53,10 +75,13 @@ module.exports = {
       const igdbData = await fetchGameFromIGDB(data.title);
       if (igdbData) {
         if (!data.description) {
-          data.description = [{ type: "paragraph", children: [{ type: "text", text: igdbData.description }] }];
+          data.description = [
+            { type: "paragraph", children: [{ type: "text", text: igdbData.description }] }
+          ];
         }
-        if (!data.poster) {
-          data.poster = igdbData.poster;
+        if (!data.poster && igdbData.poster) {
+          const fileId = await uploadImageFromUrl("https:" + igdbData.poster);
+          if (fileId) data.poster = fileId;
         }
       }
     }

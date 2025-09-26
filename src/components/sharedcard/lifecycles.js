@@ -19,21 +19,21 @@ async function fetchGameFromIGDB(title) {
   const game = data[0];
   return {
     title: game.name,
+    description: game.summary || "",
     poster: game.cover?.url
-      ? game.cover.url.replace("t_thumb", "t_cover_big")
-      : null,
-    description: game.summary || ""
+      ? "https:" + game.cover.url.replace("t_thumb", "t_cover_big")
+      : null
   };
 }
 
-// ⚡ функция для загрузки картинки в Strapi Uploads
+// ⚡ загрузка картинки в Strapi Uploads
 async function uploadImageFromUrl(url) {
   try {
     const res = await fetch(url);
     const buffer = await res.buffer();
 
     const uploaded = await strapi.plugins["upload"].services.upload.upload({
-      data: {}, // метаданные
+      data: {},
       files: {
         path: null,
         name: url.split("/").pop(),
@@ -43,7 +43,7 @@ async function uploadImageFromUrl(url) {
       }
     });
 
-    return uploaded[0].id; // возвращаем id файла
+    return uploaded[0].id; // ID файла
   } catch (err) {
     strapi.log.error("Ошибка загрузки постера:", err);
     return null;
@@ -62,25 +62,7 @@ module.exports = {
           ];
         }
         if (!data.poster && igdbData.poster) {
-          const fileId = await uploadImageFromUrl("https:" + igdbData.poster);
-          if (fileId) data.poster = fileId; // привязка к Media
-        }
-      }
-    }
-  },
-
-  async beforeUpdate(event) {
-    const { data } = event.params;
-    if (data.title) {
-      const igdbData = await fetchGameFromIGDB(data.title);
-      if (igdbData) {
-        if (!data.description) {
-          data.description = [
-            { type: "paragraph", children: [{ type: "text", text: igdbData.description }] }
-          ];
-        }
-        if (!data.poster && igdbData.poster) {
-          const fileId = await uploadImageFromUrl("https:" + igdbData.poster);
+          const fileId = await uploadImageFromUrl(igdbData.poster);
           if (fileId) data.poster = fileId;
         }
       }

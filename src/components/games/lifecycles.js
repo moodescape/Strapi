@@ -2,6 +2,9 @@
 
 const fetch = require("node-fetch");
 
+/**
+ * Забираем данные из IGDB
+ */
 async function fetchGameFromIGDB(title) {
   const res = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
@@ -26,7 +29,9 @@ async function fetchGameFromIGDB(title) {
   };
 }
 
-// загрузка картинки в Uploads
+/**
+ * Загружаем картинку в Strapi Uploads
+ */
 async function uploadImageFromUrl(url) {
   try {
     const res = await fetch(url);
@@ -43,7 +48,7 @@ async function uploadImageFromUrl(url) {
       }
     });
 
-    return uploaded[0].id;
+    return uploaded[0].id; // возвращаем ID файла
   } catch (err) {
     strapi.log.error("Ошибка загрузки постера:", err);
     return null;
@@ -51,16 +56,24 @@ async function uploadImageFromUrl(url) {
 }
 
 module.exports = {
+  /**
+   * Срабатывает перед созданием игры
+   */
   async beforeCreate(event) {
     const { data } = event.params;
+
     if (data.title) {
       const igdbData = await fetchGameFromIGDB(data.title);
+
       if (igdbData) {
+        // описание
         if (!data.description) {
           data.description = [
             { type: "paragraph", children: [{ type: "text", text: igdbData.description }] }
           ];
         }
+
+        // постер
         if (!data.poster && igdbData.poster) {
           const fileId = await uploadImageFromUrl(igdbData.poster);
           if (fileId) data.poster = fileId;

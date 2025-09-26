@@ -39,6 +39,9 @@
     },
     "heroSearchBgColor": {
       "type": "string"
+    },
+    "similarArticlesTitleColor": {
+  "type": "string"
     }
   }
 }
